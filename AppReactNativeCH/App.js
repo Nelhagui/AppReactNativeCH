@@ -1,112 +1,93 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
-import type {Node} from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Button,
+  FlatList,
 } from 'react-native';
+import TaskList from './src/components/tareas';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+const App = () => {
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const [task, setTask] = useState('');
+  const [taskList, setTaskList] = useState([]);
+
+  const onChange = (text) => {
+    setTask(text);
+  }
+
+  const addTask = () => {
+    setTaskList([...taskList, {id: Math.random(), task}]);
+    setTask('')
+  }
+
+  const deleteTask = (id) => {
+    setTaskList(taskList.filter(task => task.id !== id));
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView style={styles.container}>
+        <View style={styles.containerForm}>
+          <TextInput
+            onChangeText={(text)=>onChange(text)}
+            value={task}
+            style={styles.textInputs}
+            />
+            <Button
+              onPress={() => addTask()}
+              title='sent'
+              style={styles.buttonInputs}
+            />
         </View>
-      </ScrollView>
+        <View style={styles.containerTask}>
+          {taskList.length > 0 ? (
+            <>
+              <Text style={styles.titleTaks}>Lista de Tareas</Text>
+              <FlatList
+                keyExtractor={(item) => item.id.toString()}
+                refreshing={true}
+                data={taskList}
+                renderItem={({item}) => (
+                  <TaskList item={item} deleteTask={deleteTask} />
+                )}
+              />
+            </>
+          ) : (
+            <Text style={styles.titleTaks}>Sin Lista</Text>
+          )}
+        </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container : {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#ffffff',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  containerForm: {
+    flexDirection: 'row'
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  titleTaks:
+  {
+    textAlign: 'center',
+    marginTop: 15,
+    marginBottom: 15
   },
-  highlight: {
-    fontWeight: '700',
+  textInputs: {
+    backgroundColor: '#f0f0f0',
+    padding: 2,
+    paddingStart: 15,
+    borderBottomLeftRadius: 6,
+    borderTopLeftRadius: 6,
+    width: '80%'
   },
-});
+})
 
 export default App;
